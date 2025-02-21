@@ -1,3 +1,6 @@
 requests
 fake-useragent
 aiohttp
+aiohttp
+python-dotenv
+requests
