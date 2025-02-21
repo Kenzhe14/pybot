@@ -4,3 +4,8 @@ aiohttp
 aiohttp
 python-dotenv
 requests
+openai
+aiohttp
+fake-useragent
+pyTelegramBotAPI
+python-dotenv
