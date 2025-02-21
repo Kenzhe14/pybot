@@ -13,10 +13,10 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Bot Application"
+args = "Telegram Bot"
 
 [[workflows.workflow]]
-name = "Bot Application"
+name = "Telegram Bot"
 author = "agent"
 
 [workflows.workflow.metadata]
