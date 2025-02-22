@@ -5,22 +5,24 @@ import subprocess
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
 
+# Load environment variables
 load_dotenv()
 
-TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
-if not TOKEN:
-    raise ValueError("Пожалуйста, установите TELEGRAM_BOT_TOKEN в файле .env")
+# Get token from environment variable
+TOKEN = "7851000077:AAHE8Pib-c73RZ9EcoDIyGcVhzhKfIaA-vo"
 
-ADMIN_USERNAME = "@kzbomber_admin"  # Укажите имя пользователя администратора
-ADMIN_ID = 7379341259  # Укажите Telegram ID администратора
+ADMIN_USERNAME = "@kzbomber_admin"
+ADMIN_ID = "7379341259"
 SUBSCRIPTIONS_FILE = "subscriptions.json"
 
 # Добавляем обработку ошибок при инициализации бота
 try:
     bot = telebot.TeleBot(TOKEN)
+    print(f"Бот успешно инициализирован")
 except Exception as e:
     print(f"Ошибка при инициализации бота: {e}")
     raise
+
 
 def load_subscriptions():
     if os.path.exists(SUBSCRIPTIONS_FILE):
