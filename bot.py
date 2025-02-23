@@ -14,6 +14,7 @@ TOKEN = "7851000077:AAHE8Pib-c73RZ9EcoDIyGcVhzhKfIaA-vo"
 ADMIN_USERNAME = "@kzbomber_admin"
 ADMIN_ID = "7379341259"
 SUBSCRIPTIONS_FILE = "subscriptions.json"
+WHITELIST_FILE = "whitelist.json"
 
 # Добавляем обработку ошибок при инициализации бота
 try:
@@ -77,6 +78,23 @@ def notify_expired_subscriptions():
     save_subscriptions(subscriptions)
 
 
+def load_whitelist():
+    if os.path.exists(WHITELIST_FILE):
+        with open(WHITELIST_FILE, "r", encoding="utf-8") as file:
+            return json.load(file)
+    return []
+
+
+def save_whitelist(whitelist):
+    with open(WHITELIST_FILE, "w", encoding="utf-8") as file:
+        json.dump(whitelist, file, indent=4)
+
+
+def is_whitelisted(phone_number):
+    whitelist = load_whitelist()
+    return phone_number in whitelist
+
+
 @bot.message_handler(commands=['start'])
 def start(message):
     bot.send_message(
@@ -103,7 +121,7 @@ def check_subscription_status(message):
 
 @bot.message_handler(commands=['addsub'])
 def add_subscription_admin(message):
-    if message.chat.id != ADMIN_ID:
+    if message.chat.id != int(ADMIN_ID):
         bot.send_message(message.chat.id,
                          "❌ У вас нет прав для выполнения этой команды.")
         return
@@ -131,13 +149,42 @@ def add_subscription_admin(message):
             "❌ Ошибка! Используйте формат: /addsub user_id количество_дней")
 
 
+@bot.message_handler(commands=['addwhite'])
+def add_to_whitelist(message):
+    if str(message.chat.id) != ADMIN_ID:
+        bot.send_message(message.chat.id, "❌ У вас нет прав для выполнения этой команды.")
+        return
+
+    try:
+        args = message.text.split()
+        if len(args) != 2:
+            raise ValueError("Неверный формат. Используйте: /addwhite +7XXXXXXXXXX")
+
+        phone_number = args[1]
+        if not phone_number.startswith("+7") or not phone_number[1:].isdigit():
+            raise ValueError("Неверный формат номера")
+
+        whitelist = load_whitelist()
+        if phone_number in whitelist:
+            bot.send_message(message.chat.id, "❗️ Этот номер уже в белом списке.")
+            return
+
+        whitelist.append(phone_number)
+        save_whitelist(whitelist)
+        bot.send_message(message.chat.id, f"✅ Номер {phone_number} добавлен в белый список.")
+
+    except ValueError as e:
+        bot.send_message(message.chat.id, f"❌ Ошибка: {str(e)}")
+    except Exception as e:
+        bot.send_message(message.chat.id, "❌ Произошла ошибка при добавлении номера.")
+
+
 @bot.message_handler(func=lambda message: True)
 def handle_message(message):
     try:
         user_id = message.chat.id
         if not check_subscription(user_id):
-            bot.send_message(message.chat.id,
-                             "❌ У вас нет подписки! Купите её через /buy")
+            bot.send_message(message.chat.id, "❌ У вас нет подписки! Купите её через /buy")
             return
 
         data = message.text.split()
@@ -150,8 +197,12 @@ def handle_message(message):
         if not time.isdigit():
             raise ValueError("Неверное время")
 
-        bot.send_message(message.chat.id,
-                         f"Спам запущен для {phone_number} на {time} секунд")
+        # Проверяем, не в белом ли списке номер
+        if is_whitelisted(phone_number):
+            bot.send_message(message.chat.id, "❌ Этот номер находится в белом списке и защищен от спама.")
+            return
+
+        bot.send_message(message.chat.id, f"Спам запущен для {phone_number} на {time} секунд")
 
         # Запускаем процесс и ждем его завершения
         process = subprocess.run(["python", "spam.py", phone_number, time])

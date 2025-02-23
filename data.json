@@ -203,19 +203,16 @@
                 "headers": {
                     "Content-Type": "application/x-www-form-urlencoded; charset=UTF-                    8",
                     "Accept": "*/*",
-                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 OPR/116.0.0.0 (Edition std-2)",
-                    "Origin": "https://id.skyeng.ru",
-                    "Referer": "https://id.skyeng.ru/login?redirect=https%3A%2F%2Fskyeng.ru%2Fprograms%2F",
                     "X-Requested-With": "XMLHttpRequest"
                 },
                 "data": {
                     "phone": "%PHONE%",
-                    "csrf": "1cf5492623c2948a12.cSuiwIWMjwiBodOzPRPyJnfha_nA5SQhKIu_qvspjYE.QBrngrfp7EDN55z7YlTfQESUOZWsrhJSHuDe2olooLcVHvr5x8_5SvbmvA",
+                    "csrf": "",
                     "confirm": "0",
                     "_origin_referer": "https://skyeng.ru/programs/",
                     "skin": ""
                 },
-                "phone_pattern": "XXXXXXXXXXX",
+                "phone_pattern": "+XXXXXXXXXXX",
                 "timeout": 120
             }
     }
