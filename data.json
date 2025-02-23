@@ -1,3 +1,4 @@
+
 {
     "services": {
         "AyanMarket": {
@@ -32,7 +33,7 @@
             "expected_status": 201
         },
         "NaimiCall": {
-            "url": "https://naimi.kz/api/app/pub/login/code",
+            "url": "https://naimi.kz/api/app/pub/login/code", 
             "data": {
                 "phone": "%PHONE%",
                 "type": "call"
@@ -186,7 +187,7 @@
             "timeout": 120,
             "expected_status": 200
         },
-        "JyсanBank": {
+        "JysanBank": {
             "url": "https://api.jysanbank.kz/auth/otp/request",
             "data": {
                 "mobilePhone": "%PHONE%",
