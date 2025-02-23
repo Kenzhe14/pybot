@@ -42,9 +42,29 @@ def load_services():
 
 def acquire_lock():
     """Пытается получить блокировку для единственного экземпляра бота"""
-    if bot_lock.acquire(blocking=False):
-        return bot_lock
-    return None
+    if os.path.exists(LOCK_FILE):
+        try:
+            with open(LOCK_FILE, 'r') as f:
+                pid = int(f.read().strip())
+                try:
+                    os.kill(pid, 0)  # Проверяем существование процесса
+                    return None  # Процесс существует
+                except OSError:
+                    pass  # Процесс не существует
+        except (ValueError, FileNotFoundError):
+            pass
+    
+    with open(LOCK_FILE, 'w') as f:
+        f.write(str(os.getpid()))
+    return True
+
+def release_lock():
+    """Освобождает блокировку"""
+    try:
+        if os.path.exists(LOCK_FILE):
+            os.remove(LOCK_FILE)
+    except Exception as e:
+        print(f"Ошибка при освобождении блокировки: {e}")
 
 def load_subscriptions():
     if os.path.exists(SUBSCRIPTIONS_FILE):
@@ -268,5 +288,4 @@ if __name__ == "__main__":
         print(f"Критическая ошибка: {e}")
         raise
     finally:
-        if lock:
-            bot_lock.release()
+        release_lock()
