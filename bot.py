@@ -10,16 +10,17 @@ from datetime import datetime, timedelta
 load_dotenv()
 
 # Get token from environment variable
-TOKEN = os.getenv('TOKEN')
+TOKEN = '7851000077:AAHE8Pib-c73RZ9EcoDIyGcVhzhKfIaA-vo'
 if not TOKEN:
     raise ValueError("Не найден токен бота в переменных окружения")
 
-ADMIN_USERNAME = os.getenv('ADMIN_USERNAME', "@kzbomber_admin")
-ADMIN_ID = os.getenv('ADMIN_ID', "7379341259")
+ADMIN_USERNAME = "@kzbomber_admin"
+ADMIN_ID = 7379341259
 SUBSCRIPTIONS_FILE = "subscriptions.json"
 WHITELIST_FILE = "whitelist.json"
 LOCK_FILE = "bot.lock"
 DATA_FILE = "data.json"
+
 
 def load_services():
     """Загружает список сервисов из файла конфигурации"""
@@ -36,6 +37,7 @@ def load_services():
         print(f"Ошибка при загрузке сервисов: {e}")
         return {}
 
+
 def acquire_lock():
     """Пытается получить блокировку для единственного экземпляра бота"""
     try:
@@ -45,15 +47,18 @@ def acquire_lock():
     except IOError:
         return None
 
+
 def load_subscriptions():
     if os.path.exists(SUBSCRIPTIONS_FILE):
         with open(SUBSCRIPTIONS_FILE, "r", encoding="utf-8") as file:
             return json.load(file)
     return {}
 
+
 def save_subscriptions(subscriptions):
     with open(SUBSCRIPTIONS_FILE, "w", encoding="utf-8") as file:
         json.dump(subscriptions, file, indent=4)
+
 
 def check_subscription(user_id):
     subscriptions = load_subscriptions()
@@ -64,19 +69,23 @@ def check_subscription(user_id):
             return True
     return False
 
+
 def load_whitelist():
     if os.path.exists(WHITELIST_FILE):
         with open(WHITELIST_FILE, "r", encoding="utf-8") as file:
             return json.load(file)
     return []
 
+
 def save_whitelist(whitelist):
     with open(WHITELIST_FILE, "w", encoding="utf-8") as file:
         json.dump(whitelist, file, indent=4)
 
+
 def is_whitelisted(phone_number):
     whitelist = load_whitelist()
     return phone_number in whitelist
+
 
 try:
     bot = telebot.TeleBot(TOKEN)
@@ -87,6 +96,7 @@ except Exception as e:
     print(f"Ошибка при инициализации бота: {e}")
     raise
 
+
 @bot.message_handler(commands=['start'])
 def start(message):
     services_count = len(load_services())
@@ -95,11 +105,13 @@ def start(message):
         f"Привет! Отправь мне номер и время в формате: +7XXXXXXXXXX XX\n"
         f"Доступно сервисов: {services_count}")
 
+
 @bot.message_handler(commands=['buy'])
 def buy_subscription(message):
     bot.send_message(
         message.chat.id,
         f"Для покупки подписки напишите администратору: {ADMIN_USERNAME}")
+
 
 @bot.message_handler(commands=['check'])
 def check_subscription_status(message):
@@ -108,6 +120,7 @@ def check_subscription_status(message):
     else:
         bot.send_message(message.chat.id,
                          "❌ У вас нет подписки. Купите через /buy")
+
 
 @bot.message_handler(commands=['addsub'])
 def add_subscription_admin(message):
@@ -142,6 +155,7 @@ def add_subscription_admin(message):
             message.chat.id,
             "❌ Ошибка! Используйте формат: /addsub user_id количество_дней")
 
+
 @bot.message_handler(commands=['addwhite'])
 def add_to_whitelist(message):
     if str(message.chat.id) != ADMIN_ID:
@@ -152,7 +166,8 @@ def add_to_whitelist(message):
     try:
         args = message.text.split()
         if len(args) != 2:
-            raise ValueError("Неверный формат. Используйте: /addwhite +7XXXXXXXXXX")
+            raise ValueError(
+                "Неверный формат. Используйте: /addwhite +7XXXXXXXXXX")
 
         phone_number = args[1]
         if not phone_number.startswith("+7") or not phone_number[1:].isdigit():
@@ -160,7 +175,8 @@ def add_to_whitelist(message):
 
         whitelist = load_whitelist()
         if phone_number in whitelist:
-            bot.send_message(message.chat.id, "❗️ Этот номер уже в белом списке")
+            bot.send_message(message.chat.id,
+                             "❗️ Этот номер уже в белом списке")
             return
 
         whitelist.append(phone_number)
@@ -174,18 +190,21 @@ def add_to_whitelist(message):
         bot.send_message(message.chat.id,
                          "❌ Произошла ошибка при добавлении номера")
 
+
 @bot.message_handler(commands=['services'])
 def list_services(message):
     services = load_services()
     service_list = "\n".join([f"- {name}" for name in services.keys()])
-    bot.send_message(
-        message.chat.id,
-        f"Доступные сервисы ({len(services)}):\n{service_list}")
+    bot.send_message(message.chat.id,
+                     f"Доступные сервисы ({len(services)}):\n{service_list}")
+
 
 @bot.message_handler(func=lambda message: True)
 def handle_message(message):
     try:
-        print(f"Обработка сообщения от пользователя {message.chat.id}: {message.text}")
+        print(
+            f"Обработка сообщения от пользователя {message.chat.id}: {message.text}"
+        )
         if not check_subscription(message.chat.id):
             bot.send_message(message.chat.id,
                              "❌ У вас нет подписки! Купите через /buy")
@@ -209,7 +228,9 @@ def handle_message(message):
 
         process = None  # Initialize process variable
         try:
-            print(f"Запуск спама для номера {phone_number} на {time_duration} секунд")
+            print(
+                f"Запуск спама для номера {phone_number} на {time_duration} секунд"
+            )
             # Запускаем скрипт spam.py с параметрами
             process = subprocess.Popen(
                 ["python", "spam.py", phone_number, time_duration],
@@ -223,14 +244,16 @@ def handle_message(message):
             )
 
             # Ждем завершения процесса
-            stdout, stderr = process.communicate(timeout=int(time_duration) + 10)
+            stdout, stderr = process.communicate(timeout=int(time_duration) +
+                                                 10)
 
             # Проверяем результат
             if process.returncode == 0:
                 bot.send_message(message.chat.id, "✅ Спам успешно завершен!")
             else:
                 error_msg = stderr.decode() if stderr else "Неизвестная ошибка"
-                print(f"Ошибка при выполнении спама: {error_msg}")  # Add error logging
+                print(f"Ошибка при выполнении спама: {error_msg}"
+                      )  # Add error logging
                 bot.send_message(
                     message.chat.id,
                     f"❌ Ошибка при выполнении спама: {error_msg}")
@@ -241,7 +264,8 @@ def handle_message(message):
             bot.send_message(message.chat.id,
                              "❌ Превышено время ожидания. Спам остановлен.")
         except Exception as e:
-            print(f"Критическая ошибка при запуске спама: {str(e)}")  # Add error logging
+            print(f"Критическая ошибка при запуске спама: {str(e)}"
+                  )  # Add error logging
             bot.send_message(
                 message.chat.id,
                 f"❌ Произошла ошибка при запуске спама: {str(e)}")
@@ -250,6 +274,7 @@ def handle_message(message):
         bot.send_message(
             message.chat.id,
             "❌ Ошибка: неверный формат ввода. Используйте: +7XXXXXXXXXX XX")
+
 
 if __name__ == "__main__":
     # Проверяем, не запущен ли уже бот
