@@ -16,6 +16,12 @@ ADMIN_ID = "7379341259"
 SUBSCRIPTIONS_FILE = "subscriptions.json"
 WHITELIST_FILE = "whitelist.json"
 
+# Кэш для хранения whitelist в памяти
+_whitelist_cache = None
+_subscriptions_cache = None
+_last_cache_update = None
+CACHE_TIMEOUT = 300  # 5 минут
+
 # Добавляем обработку ошибок при инициализации бота
 try:
     bot = telebot.TeleBot(TOKEN)
@@ -24,76 +30,72 @@ except Exception as e:
     print(f"Ошибка при инициализации бота: {e}")
     raise
 
+def _update_cache_if_needed():
+    global _whitelist_cache, _subscriptions_cache, _last_cache_update
+    current_time = datetime.now()
 
-def load_subscriptions():
-    if os.path.exists(SUBSCRIPTIONS_FILE):
-        with open(SUBSCRIPTIONS_FILE, "r", encoding="utf-8") as file:
-            return json.load(file)
-    return {}
+    if (_last_cache_update is None or 
+        (current_time - _last_cache_update).total_seconds() > CACHE_TIMEOUT):
+        try:
+            if os.path.exists(WHITELIST_FILE):
+                with open(WHITELIST_FILE, "r", encoding="utf-8") as file:
+                    _whitelist_cache = set(json.load(file))
+            else:
+                _whitelist_cache = set()
 
+            if os.path.exists(SUBSCRIPTIONS_FILE):
+                with open(SUBSCRIPTIONS_FILE, "r", encoding="utf-8") as file:
+                    _subscriptions_cache = json.load(file)
+            else:
+                _subscriptions_cache = {}
+
+            _last_cache_update = current_time
+        except Exception as e:
+            print(f"Ошибка обновления кэша: {e}")
+            # В случае ошибки чтения кэша, сбрасываем его
+            _whitelist_cache = set()
+            _subscriptions_cache = {}
 
 def save_subscriptions(subscriptions):
-    with open(SUBSCRIPTIONS_FILE, "w", encoding="utf-8") as file:
-        json.dump(subscriptions, file, indent=4)
-
+    global _subscriptions_cache
+    try:
+        with open(SUBSCRIPTIONS_FILE, "w", encoding="utf-8") as file:
+            json.dump(subscriptions, file, indent=4)
+        _subscriptions_cache = subscriptions
+    except Exception as e:
+        print(f"Ошибка сохранения подписок: {e}")
 
 def add_subscription(user_id, days):
-    subscriptions = load_subscriptions()
-    expires_at = (datetime.now() +
-                  timedelta(days=days)).strftime("%Y-%m-%d %H:%M:%S")
-    subscriptions[str(user_id)] = {"expires_at": expires_at, "days": days}
-    save_subscriptions(subscriptions)
-
+    _update_cache_if_needed()
+    expires_at = (datetime.now() + timedelta(days=days)).strftime("%Y-%m-%d %H:%M:%S")
+    if _subscriptions_cache is None:
+        _subscriptions_cache = {}
+    _subscriptions_cache[str(user_id)] = {"expires_at": expires_at, "days": days}
+    save_subscriptions(_subscriptions_cache)
 
 def check_subscription(user_id):
-    subscriptions = load_subscriptions()
-    if str(user_id) in subscriptions:
+    _update_cache_if_needed()
+    if _subscriptions_cache is None:
+        return False
+
+    if str(user_id) in _subscriptions_cache:
         expires_at = datetime.strptime(
-            subscriptions[str(user_id)]["expires_at"], "%Y-%m-%d %H:%M:%S")
-        if datetime.now() < expires_at:
-            return True
+            _subscriptions_cache[str(user_id)]["expires_at"], "%Y-%m-%d %H:%M:%S")
+        return datetime.now() < expires_at
     return False
 
-
-def notify_expired_subscriptions():
-    subscriptions = load_subscriptions()
-    expired_users = []
-
-    for user_id, data in subscriptions.items():
-        expires_at = datetime.strptime(data["expires_at"], "%Y-%m-%d %H:%M:%S")
-        if datetime.now() > expires_at:
-            try:
-                bot.send_message(
-                    int(user_id),
-                    "❌ Ваша подписка истекла! Купите новую через /buy")
-            except telebot.apihelper.ApiTelegramException as e:
-                print(f"Ошибка отправки сообщения пользователю {user_id}: {e}")
-
-            expired_users.append(user_id)  # Добавляем в список для удаления
-
-    # Удаляем подписки после уведомления
-    for user_id in expired_users:
-        del subscriptions[user_id]
-
-    save_subscriptions(subscriptions)
-
-
-def load_whitelist():
-    if os.path.exists(WHITELIST_FILE):
-        with open(WHITELIST_FILE, "r", encoding="utf-8") as file:
-            return json.load(file)
-    return []
-
-
 def save_whitelist(whitelist):
-    with open(WHITELIST_FILE, "w", encoding="utf-8") as file:
-        json.dump(whitelist, file, indent=4)
-
+    global _whitelist_cache
+    try:
+        with open(WHITELIST_FILE, "w", encoding="utf-8") as file:
+            json.dump(list(whitelist), file, indent=4)
+        _whitelist_cache = set(whitelist)
+    except Exception as e:
+        print(f"Ошибка сохранения белого списка: {e}")
 
 def is_whitelisted(phone_number):
-    whitelist = load_whitelist()
-    return phone_number in whitelist
-
+    _update_cache_if_needed()
+    return phone_number in _whitelist_cache if _whitelist_cache is not None else False
 
 @bot.message_handler(commands=['start'])
 def start(message):
@@ -101,13 +103,11 @@ def start(message):
         message.chat.id,
         "Привет! Отправь мне номер и время в формате: +7XXXXXXXXXX XX")
 
-
 @bot.message_handler(commands=['buy'])
 def buy_subscription(message):
     bot.send_message(
         message.chat.id,
         f"Для покупки подписки напишите администратору: {ADMIN_USERNAME}")
-
 
 @bot.message_handler(commands=['check'])
 def check_subscription_status(message):
@@ -117,7 +117,6 @@ def check_subscription_status(message):
     else:
         bot.send_message(message.chat.id,
                          "❌ Ваша подписка истекла. Купите её через /buy")
-
 
 @bot.message_handler(commands=['addsub'])
 def add_subscription_admin(message):
@@ -148,11 +147,11 @@ def add_subscription_admin(message):
             message.chat.id,
             "❌ Ошибка! Используйте формат: /addsub user_id количество_дней")
 
-
 @bot.message_handler(commands=['addwhite'])
 def add_to_whitelist(message):
     if str(message.chat.id) != ADMIN_ID:
-        bot.send_message(message.chat.id, "❌ У вас нет прав для выполнения этой команды.")
+        bot.send_message(message.chat.id, "❌ Эта команда доступна только администратору бота.")
+        print(f"Попытка доступа к админ-команде от пользователя {message.chat.id}")
         return
 
     try:
@@ -164,20 +163,24 @@ def add_to_whitelist(message):
         if not phone_number.startswith("+7") or not phone_number[1:].isdigit():
             raise ValueError("Неверный формат номера")
 
-        whitelist = load_whitelist()
-        if phone_number in whitelist:
+        _update_cache_if_needed()
+        if _whitelist_cache is None:
+            _whitelist_cache = set()
+
+        if phone_number in _whitelist_cache:
             bot.send_message(message.chat.id, "❗️ Этот номер уже в белом списке.")
             return
 
-        whitelist.append(phone_number)
-        save_whitelist(whitelist)
+        _whitelist_cache.add(phone_number)
+        save_whitelist(_whitelist_cache)
         bot.send_message(message.chat.id, f"✅ Номер {phone_number} добавлен в белый список.")
+        print(f"Администратор добавил номер {phone_number} в белый список")
 
     except ValueError as e:
         bot.send_message(message.chat.id, f"❌ Ошибка: {str(e)}")
     except Exception as e:
         bot.send_message(message.chat.id, "❌ Произошла ошибка при добавлении номера.")
-
+        print(f"Ошибка при добавлении в белый список: {e}")
 
 @bot.message_handler(func=lambda message: True)
 def handle_message(message):
@@ -215,11 +218,11 @@ def handle_message(message):
             message.chat.id,
             "❌ Ошибка: неверный формат ввода. Используйте: +7XXXXXXXXXX XX")
 
-
 if __name__ == "__main__":
     try:
         print("Бот запущен...")
-        notify_expired_subscriptions()
+        # Инициализируем кэш при запуске
+        _update_cache_if_needed()
         bot.infinity_polling(timeout=60, long_polling_timeout=30)
     except Exception as e:
         print(f"Критическая ошибка: {e}")

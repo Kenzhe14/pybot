@@ -10,3 +10,5 @@ fake-useragent
 pyTelegramBotAPI
 python-dotenv
 twilio
+pyTelegramBotAPI
+python-dotenv
