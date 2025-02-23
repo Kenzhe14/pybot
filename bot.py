@@ -20,6 +20,7 @@ SUBSCRIPTIONS_FILE = "subscriptions.json"
 WHITELIST_FILE = "whitelist.json"
 LOCK_FILE = "bot.lock"
 
+
 def acquire_lock():
     """Пытается получить блокировку для единственного экземпляра бота"""
     try:
@@ -29,15 +30,18 @@ def acquire_lock():
     except IOError:
         return None
 
+
 def load_subscriptions():
     if os.path.exists(SUBSCRIPTIONS_FILE):
         with open(SUBSCRIPTIONS_FILE, "r", encoding="utf-8") as file:
             return json.load(file)
     return {}
 
+
 def save_subscriptions(subscriptions):
     with open(SUBSCRIPTIONS_FILE, "w", encoding="utf-8") as file:
         json.dump(subscriptions, file, indent=4)
+
 
 def check_subscription(user_id):
     subscriptions = load_subscriptions()
@@ -48,21 +52,24 @@ def check_subscription(user_id):
             return True
     return False
 
+
 def load_whitelist():
     if os.path.exists(WHITELIST_FILE):
         with open(WHITELIST_FILE, "r", encoding="utf-8") as file:
             return json.load(file)
     return []
 
+
 def save_whitelist(whitelist):
     with open(WHITELIST_FILE, "w", encoding="utf-8") as file:
         json.dump(whitelist, file, indent=4)
+
 
 def is_whitelisted(phone_number):
     whitelist = load_whitelist()
     return phone_number in whitelist
 
-# Инициализация бота
+
 try:
     bot = telebot.TeleBot(TOKEN)
     print(f"Бот успешно инициализирован")
@@ -70,11 +77,13 @@ except Exception as e:
     print(f"Ошибка при инициализации бота: {e}")
     raise
 
+
 @bot.message_handler(commands=['start'])
 def start(message):
     bot.send_message(
         message.chat.id,
         "Привет! Отправь мне номер и время в формате: +7XXXXXXXXXX XX")
+
 
 @bot.message_handler(commands=['buy'])
 def buy_subscription(message):
@@ -82,17 +91,21 @@ def buy_subscription(message):
         message.chat.id,
         f"Для покупки подписки напишите администратору: {ADMIN_USERNAME}")
 
+
 @bot.message_handler(commands=['check'])
 def check_subscription_status(message):
     if check_subscription(message.chat.id):
         bot.send_message(message.chat.id, "✅ У вас есть активная подписка!")
     else:
-        bot.send_message(message.chat.id, "❌ У вас нет подписки. Купите через /buy")
+        bot.send_message(message.chat.id,
+                         "❌ У вас нет подписки. Купите через /buy")
+
 
 @bot.message_handler(commands=['addsub'])
 def add_subscription_admin(message):
     if str(message.chat.id) != ADMIN_ID:
-        bot.send_message(message.chat.id, "❌ У вас нет прав для выполнения этой команды")
+        bot.send_message(message.chat.id,
+                         "❌ У вас нет прав для выполнения этой команды")
         return
 
     try:
@@ -104,7 +117,8 @@ def add_subscription_admin(message):
         days = int(args[2])
 
         subscriptions = load_subscriptions()
-        expires_at = (datetime.now() + timedelta(days=days)).strftime("%Y-%m-%d %H:%M:%S")
+        expires_at = (datetime.now() +
+                      timedelta(days=days)).strftime("%Y-%m-%d %H:%M:%S")
         subscriptions[user_id] = {"expires_at": expires_at, "days": days}
         save_subscriptions(subscriptions)
 
@@ -120,10 +134,12 @@ def add_subscription_admin(message):
             message.chat.id,
             "❌ Ошибка! Используйте формат: /addsub user_id количество_дней")
 
+
 @bot.message_handler(commands=['addwhite'])
 def add_to_whitelist(message):
     if str(message.chat.id) != ADMIN_ID:
-        bot.send_message(message.chat.id, "❌ Эта команда доступна только администратору")
+        bot.send_message(message.chat.id,
+                         "❌ Эта команда доступна только администратору")
         return
 
     try:
@@ -142,18 +158,22 @@ def add_to_whitelist(message):
 
         whitelist.append(phone_number)
         save_whitelist(whitelist)
-        bot.send_message(message.chat.id, f"✅ Номер {phone_number} добавлен в белый список")
+        bot.send_message(message.chat.id,
+                         f"✅ Номер {phone_number} добавлен в белый список")
 
     except ValueError as e:
         bot.send_message(message.chat.id, f"❌ Ошибка: {str(e)}")
     except Exception as e:
-        bot.send_message(message.chat.id, "❌ Произошла ошибка при добавлении номера")
+        bot.send_message(message.chat.id,
+                         "❌ Произошла ошибка при добавлении номера")
+
 
 @bot.message_handler(func=lambda message: True)
 def handle_message(message):
     try:
         if not check_subscription(message.chat.id):
-            bot.send_message(message.chat.id, "❌ У вас нет подписки! Купите через /buy")
+            bot.send_message(message.chat.id,
+                             "❌ У вас нет подписки! Купите через /buy")
             return
 
         data = message.text.split()
@@ -177,13 +197,13 @@ def handle_message(message):
             process = subprocess.Popen(
                 ["python", "spam.py", phone_number, time_duration],
                 stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE
-            )
+                stderr=subprocess.PIPE)
 
             # Отправляем сообщение о начале спама
             bot.send_message(
                 message.chat.id,
-                f"⏳ Начинаю спам для номера {phone_number} на {time_duration} секунд")
+                f"⏳ Начинаю спам для номера {phone_number} на {time_duration} секунд"
+            )
 
             # Ждем завершения процесса
             stdout, stderr = process.communicate(timeout=int(time_duration) + 10)
@@ -199,9 +219,8 @@ def handle_message(message):
 
         except subprocess.TimeoutExpired:
             process.kill()
-            bot.send_message(
-                message.chat.id,
-                "❌ Превышено время ожидания. Спам остановлен.")
+            bot.send_message(message.chat.id,
+                             "❌ Превышено время ожидания. Спам остановлен.")
         except Exception as e:
             bot.send_message(
                 message.chat.id,
@@ -211,6 +230,7 @@ def handle_message(message):
         bot.send_message(
             message.chat.id,
             "❌ Ошибка: неверный формат ввода. Используйте: +7XXXXXXXXXX XX")
+
 
 if __name__ == "__main__":
     # Проверяем, не запущен ли уже бот

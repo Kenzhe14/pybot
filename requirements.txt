@@ -16,3 +16,7 @@ flask-login
 flask-wtf
 flask-login
 oauthlib
+aiohttp
+fake-useragent
+pyTelegramBotAPI
+python-dotenv
