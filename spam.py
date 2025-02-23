@@ -98,7 +98,7 @@ class BloodTrail:
 
     def __init__(self, number, timer):
         try:
-            with open("data.json", "r", encoding="utf-8") as f:
+            with open("data.json", "r", encoding="utf-8", errors="ignore") as f:
                 self.data = json.load(f)
             if not number or not timer:
                 print(f"{' ' : >40}ERROR: Wrong args.")
