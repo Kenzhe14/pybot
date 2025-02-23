@@ -28,8 +28,9 @@ def load_services():
             data = json.load(f)
             services = data.get('services', {})
             print(f"Загружено {len(services)} сервисов:")
-            for service_name in services.keys():
-                print(f"- {service_name}")
+            for service_name, service_data in services.items():
+                status = service_data.get('expected_status', 'N/A')
+                print(f"- {service_name} (Status: {status})")
             return services
     except Exception as e:
         print(f"Ошибка при загрузке сервисов: {e}")
