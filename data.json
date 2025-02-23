@@ -7,8 +7,9 @@
                 "surname": "",
                 "phone": "%PHONE%"
             },
-            "phone_pattern":"+XXXXXXXXXXX",
-            "timeout": 60
+            "phone_pattern": "+XXXXXXXXXXX",
+            "timeout": 60,
+            "expected_status": 200
         },
         "Mechta": {
             "url": "https://www.mechta.kz/api/v2/send-sms",
@@ -16,8 +17,9 @@
                 "phone": "%PHONE%",
                 "type": "login"
             },
-            "phone_pattern":"XXXXXXXXXXX",
-            "timeout": 60
+            "phone_pattern": "XXXXXXXXXXX",
+            "timeout": 60,
+            "expected_status": 200
         },
         "NaimiSMS": {
             "url": "https://naimi.kz/api/app/pub/login/code",
@@ -25,8 +27,9 @@
                 "phone": "%PHONE%",
                 "type": "sms"
             },
-            "phone_pattern":"+XXXXXXXXXXX",
-            "timeout": 60
+            "phone_pattern": "+XXXXXXXXXXX",
+            "timeout": 60,
+            "expected_status": 201
         },
         "NaimiCall": {
             "url": "https://naimi.kz/api/app/pub/login/code",
@@ -34,88 +37,9 @@
                 "phone": "%PHONE%",
                 "type": "call"
             },
-            "phone_pattern":"+XXXXXXXXXXX",
-            "timeout": 60
-        },
-        "Pandora": {
-            "url": "https://pandora.kz/forgotpass/",
-            "data": {
-                "email": "",
-                "phone": "%PHONE%",
-                "method": "phone"
-            },
-            "phone_pattern":"+X (XXX) XXX-XX-XX",
-            "timeout": 15
-        },
-        "OneCreditCall": {
-            "url": "https://api.onecredit.kz/v2/user/phone-confirmation",
-            "data": {"phone": "%PHONE%"},
-            "phone_pattern":"+XXXXXXXXXXX",
-            "timeout": 240
-        },
-        "OneCreditSMS": {
-            "url": "https://api.onecredit.kz/user/get-token",
-            "data": {
-                "fingerprint": {},
-                "login": "%PHONE%",
-                "re-captcha-action": "REGISTRATION",
-                "re-captcha-token": ""
-            },
-            "phone_pattern":"XXXXXXXXXXX",
-            "timeout": 120
-        },
-        "MoneyMan": {
-            "url": "https://moneyman.kz/secure/rest/registration/step1/confirmMobilePhone",
-            "data": {"mobilePhone": "%PHONE%"},
-            "phone_pattern":"+X(XXX)XXX-XX-XX",
-            "timeout": 60
-        },
-        "Credit365SMS": {
-            "url": "https://api.credit365.kz/user/get-token",
-            "data": {
-                "fingerprint": {},
-                "login": "%PHONE%",
-                "re-captcha-action": "REGISTRATION",
-                "re-captcha-token": ""
-            },
-            "phone_pattern":"XXXXXXXXXXX",
-            "timeout": 120
-        },
-        "Credit365Call": {
-            "url": "https://api.credit365.kz/v2/user/phone-confirmation",
-            "data": {"phone": "%PHONE%"},
-            "phone_pattern":"XXXXXXXXXXX",
-            "timeout": 120
-        },
-        "MyCar": {
-            "url": "https://sso.mycar.kz/auth/login/",
-            "data": {"phone_number":"%PHONE%"},
-            "phone_pattern":"+XXXXXXXXXXX",
-            "timeout": 60
-        },
-        "Apteka": {
-            "url": "https://api.apteka.ru/Auth/Auth_Code",
-            "data": {"phone":"%PHONE%", "u": "U"},
-            "phone_pattern":"+X (XXX) XXX-XX-XX",
-            "timeout": 120
-        },
-        "Bilim": {
-            "url": "https://login.bilimland.kz/api/v1/registration",
-            "data": {"phone": "%PHONE%"},
-            "phone_pattern":"+X (XXX) XXX-XX-XX",
-            "timeout": 90
-        },
-        "CleverMarket": {
-            "url": "https://clevermarket.kz/auth/code",
-            "data": {"phoneNumber": "%PHONE%"},
-            "phone_pattern":"XXXXXXXXXXX",
-            "timeout": 90
-        },
-        "CreditPlusCall": {
-            "url": "https://api.creditplus.kz/v2/user/phone-confirmation",
-            "data": {"phone": "%PHONE%"},
-            "phone_pattern":"XXXXXXXXXXX",
-            "timeout": 240
+            "phone_pattern": "+XXXXXXXXXXX",
+            "timeout": 60,
+            "expected_status": 201
         },
         "CreditPlusSMS": {
             "url": "https://api.creditplus.kz/user/get-token",
@@ -125,77 +49,290 @@
                 "re-captcha-action": "REGISTRATION",
                 "re-captcha-token": ""
             },
-            "phone_pattern":"XXXXXXXXXXX",
-            "timeout": 120
-        },
-        "AcreditSMS": {
-            "url": "https://api.acredit.kz/user/get-token",
-            "data": {
-                "authMethod": "check",
-                "fingerprint": {},
-                "login": "%PHONE%"
-            },
             "phone_pattern": "XXXXXXXXXXX",
-            "timeout": 120
+            "timeout": 120,
+            "expected_status": 200
         },
-        "AcreditCall": {
-            "url": "https://api.acredit.kz/v2/user/phone-confirmation",
-            "data": {"phone": "%PHONE%"},
-            "phone_pattern":"XXXXXXXXXXX",
-            "timeout": 480
-        },
-        "CreditBarSMS": {
-            "url": "https://cabinet.creditbar.kz/rest/auth/sms",
-            "data": {"phone": "%PHONE%"},
-            "phone_pattern":"XXXXXXXXXXX",
-            "timeout": 200
-        },
-        "Soso": {
-            "url": "https://www.soso.kz/api/landing-form",
-            "data": {"amount": "100000", "phone": "%PHONE%", "locale": "ru"},
-            "phone_pattern":"+XXXXXXXXXXX",
-            "timeout": 15
-        },
-        "SaleScout": {
-            "url": "https://api.salescout.me/api/auth/registration",
+        "MarketplaceFood": {
+            "url": "https://api.marketplace.kz/api/v1/auth/otp",
             "data": {
-                "email": "%PHONE%",
-                "name": "Али",
-                "surname": "Алиби"
-            },
-            "phone_pattern": "+X (XXX) XXX XXXX",
-            "timeout": 60
-        },
-        "ScoolarShip": {
-            "url": "https://leadback.ru/backend/widget_call.php",
-            "data": {
-                "callback": "jsonpCallCallback",
-                "site": "scholarships.kz",
                 "phone": "%PHONE%",
-                "widget_key": "f6c15b2d3716817d74f0aa35",
-                "user_id": "50174",
-                "delayed": "",
-                "tz": "6",
-                "guid": "c55dbf57-1889-4efa-c82f-6a7aa05fcf9c",
-                "calltouch": "",
-                "department": "",
-                "label": "",
-                "initiator": "",
-                "cache": "0.7425573688596776",
-                "_": "1740137505426"
+                "type": "registration"
+            },
+            "phone_pattern": "+7XXXXXXXXXX",
+            "timeout": 60,
+            "expected_status": 200
         },
-            "phone_pattern": "+XXXXXXXXXXX",
-            "timeout": 30
+        "BeelineKZ": {
+            "url": "https://beeline.kz/api/auth/code",
+            "data": {
+                "msisdn": "%PHONE%"
+            },
+            "phone_pattern": "7XXXXXXXXXX",
+            "timeout": 90,
+            "expected_status": 200
         },
-            "CreditPlusSMS": {
-                "url": "https://api.creditplus.kz/user/get-token",
-                "data": {
-                    "authMethod": "check",
-                    "fingerprint": {},
-                    "login": "%PHONE%"
-                },
-                "phone_pattern": "XXXXXXXXXXX",
-                "timeout": 120
-            }
+        "KcellKZ": {
+            "url": "https://api.kcell.kz/auth/v2/otp/request",
+            "data": {
+                "phoneNumber": "%PHONE%",
+                "language": "ru"
+            },
+            "phone_pattern": "7XXXXXXXXXX",
+            "timeout": 120,
+            "expected_status": 200
+        },
+        "ActiveKZ": {
+            "url": "https://api.active.kz/auth/register",
+            "data": {
+                "phone": "%PHONE%",
+                "type": "register"
+            },
+            "phone_pattern": "+7XXXXXXXXXX",
+            "timeout": 60,
+            "expected_status": 201
+        },
+        "SulpakKZ": {
+            "url": "https://api.sulpak.kz/api/auth/generate-code",
+            "data": {
+                "phone": "%PHONE%"
+            },
+            "phone_pattern": "+7XXXXXXXXXX",
+            "timeout": 90,
+            "expected_status": 200
+        },
+        "TechnodomSMS": {
+            "url": "https://api.technodom.kz/api/v1/user/code",
+            "data": {
+                "phone": "%PHONE%",
+                "type": "register"
+            },
+            "phone_pattern": "+7XXXXXXXXXX",
+            "timeout": 60,
+            "expected_status": 200
+        },
+        "ArbuzkzSMS": {
+            "url": "https://arbuz.kz/api/v1/user/request-otp",
+            "data": {
+                "phone": "%PHONE%"
+            },
+            "phone_pattern": "+7XXXXXXXXXX",
+            "timeout": 120,
+            "expected_status": 200
+        },
+        "ChocolifeCall": {
+            "url": "https://api.chocolife.me/auth/call/code",
+            "data": {
+                "phone": "%PHONE%"
+            },
+            "phone_pattern": "+7XXXXXXXXXX",
+            "timeout": 60,
+            "expected_status": 200
+        },
+        "ChocolifeSMS": {
+            "url": "https://api.chocolife.me/auth/sms/code",
+            "data": {
+                "phone": "%PHONE%"
+            },
+            "phone_pattern": "+7XXXXXXXXXX",
+            "timeout": 60,
+            "expected_status": 200
+        },
+        "KolesaCall": {
+            "url": "https://mobileapi.kolesa.kz/v2/auth/call",
+            "data": {
+                "phone": "%PHONE%"
+            },
+            "phone_pattern": "+7XXXXXXXXXX",
+            "timeout": 180,
+            "expected_status": 200
+        },
+        "KolesaSMS": {
+            "url": "https://mobileapi.kolesa.kz/v2/auth/sms",
+            "data": {
+                "phone": "%PHONE%"
+            },
+            "phone_pattern": "+7XXXXXXXXXX",
+            "timeout": 120,
+            "expected_status": 200
+        },
+        "KaspiBank": {
+            "url": "https://kaspi.kz/api/auth/sms-code",
+            "data": {
+                "phoneNumber": "%PHONE%",
+                "confirmationChannelType": "SMS"
+            },
+            "phone_pattern": "+7XXXXXXXXXX",
+            "timeout": 60,
+            "expected_status": 200
+        },
+        "ForteBank": {
+            "url": "https://api.forte.kz/authentication/rest/registration/otp",
+            "data": {
+                "phone": "%PHONE%",
+                "type": "REGISTRATION"
+            },
+            "phone_pattern": "7XXXXXXXXXX",
+            "timeout": 90,
+            "expected_status": 201
+        },
+        "HalykBank": {
+            "url": "https://homebank.kz/api/auth/otp",
+            "data": {
+                "phoneNumber": "%PHONE%",
+                "otpType": "SMS"
+            },
+            "phone_pattern": "+7XXXXXXXXXX",
+            "timeout": 120,
+            "expected_status": 200
+        },
+        "JyсanBank": {
+            "url": "https://api.jysanbank.kz/auth/otp/request",
+            "data": {
+                "mobilePhone": "%PHONE%",
+                "channel": "SMS"
+            },
+            "phone_pattern": "7XXXXXXXXXX",
+            "timeout": 90,
+            "expected_status": 200
+        },
+        "EuBank": {
+            "url": "https://eubank.kz/api/sms-verification",
+            "data": {
+                "phone": "%PHONE%",
+                "action": "registration"
+            },
+            "phone_pattern": "+7XXXXXXXXXX",
+            "timeout": 60,
+            "expected_status": 200
+        },
+        "FoodDelivery": {
+            "url": "https://food-delivery.kz/api/v2/auth/otp",
+            "data": {
+                "phone": "%PHONE%",
+                "type": "registration"
+            },
+            "phone_pattern": "+7XXXXXXXXXX",
+            "timeout": 60,
+            "expected_status": 201
+        },
+        "GlowoPizza": {
+            "url": "https://api.glovo.kz/v1/auth/request-code",
+            "data": {
+                "phone": "%PHONE%",
+                "country_code": "KZ"
+            },
+            "phone_pattern": "7XXXXXXXXXX",
+            "timeout": 90,
+            "expected_status": 200
+        },
+        "YandexGoKZ": {
+            "url": "https://taxi.yandex.kz/3.0/auth/send-code",
+            "data": {
+                "phone": "%PHONE%"
+            },
+            "phone_pattern": "+7XXXXXXXXXX",
+            "timeout": 60,
+            "expected_status": 200
+        },
+        "InDriverKZ": {
+            "url": "https://api.indriver.com/api/authentication/phone-verification",
+            "data": {
+                "phone": "%PHONE%",
+                "locale": "kk"
+            },
+            "phone_pattern": "+7XXXXXXXXXX",
+            "timeout": 120,
+            "expected_status": 200
+        },
+        "WoltKZ": {
+            "url": "https://consumer-api.wolt.com/v1/authentication/phone/send-verification",
+            "data": {
+                "phone": "%PHONE%",
+                "country_code": "KZ"
+            },
+            "phone_pattern": "+7XXXXXXXXXX",
+            "timeout": 60,
+            "expected_status": 200
+        },
+        "ShopFood": {
+            "url": "https://shopfood.kz/api/v1/auth/verify-phone",
+            "data": {
+                "phone": "%PHONE%",
+                "type": "register"
+            },
+            "phone_pattern": "+7XXXXXXXXXX",
+            "timeout": 90,
+            "expected_status": 200
+        },
+        "OnayBus": {
+            "url": "https://onay.kz/api/auth/send-code",
+            "data": {
+                "phone": "%PHONE%"
+            },
+            "phone_pattern": "+7XXXXXXXXXX",
+            "timeout": 60,
+            "expected_status": 200
+        },
+        "FreedomBank": {
+            "url": "https://api.freedombank.kz/authentication/auth/otp",
+            "data": {
+                "phoneNumber": "%PHONE%",
+                "type": "REGISTRATION"
+            },
+            "phone_pattern": "7XXXXXXXXXX",
+            "timeout": 90,
+            "expected_status": 201
+        },
+        "CoursetonKZ": {
+            "url": "https://courseton.kz/api/v1/auth/send-code",
+            "data": {
+                "phone": "%PHONE%",
+                "type": "registration"
+            },
+            "phone_pattern": "+7XXXXXXXXXX",
+            "timeout": 60,
+            "expected_status": 200
+        },
+        "iTestKZ": {
+            "url": "https://itest.kz/api/v1/auth/send-verification",
+            "data": {
+                "phone": "%PHONE%",
+                "purpose": "registration"
+            },
+            "phone_pattern": "+7XXXXXXXXXX",
+            "timeout": 90,
+            "expected_status": 200
+        },
+        "UStudyKZ": {
+            "url": "https://ustudy.kz/api/auth/phone",
+            "data": {
+                "phone": "%PHONE%",
+                "action": "register"
+            },
+            "phone_pattern": "+7XXXXXXXXXX",
+            "timeout": 60,
+            "expected_status": 200
+        },
+        "RBKBank": {
+            "url": "https://api.rbk.kz/v1/auth/otp",
+            "data": {
+                "phoneNumber": "%PHONE%",
+                "type": "REGISTRATION"
+            },
+            "phone_pattern": "7XXXXXXXXXX",
+            "timeout": 90,
+            "expected_status": 201
+        },
+        "CenterCreditBank": {
+            "url": "https://online.bcc.kz/api/auth/otp",
+            "data": {
+                "phone": "%PHONE%",
+                "type": "registration"
+            },
+            "phone_pattern": "+7XXXXXXXXXX",
+            "timeout": 120,
+            "expected_status": 200
+        }
     }
 }
